@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F1F8E9">
+    android:background="#F1F8E9"
+    android:fitsSystemWindows="true">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/toolbar_add_entry"
@@ -13,7 +14,7 @@
         android:background="#2E7D32"
         android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="@drawable/abc_ic_ab_back_material"
+        app:navigationIcon="?attr/homeAsUpIndicator"
         app:title="Farm Diary"
         app:titleTextColor="@android:color/white" />
 
@@ -126,29 +127,33 @@
                         android:textColor="#2E7D32"
                         android:textStyle="bold" />
 
-                    <RadioGroup
-                        android:id="@+id/crop_status_radio_group"
+                    <com.google.android.material.chip.ChipGroup
+                        android:id="@+id/crop_status_chip_group"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        app:singleSelection="true">
 
-                        <RadioButton
-                            android:id="@+id/radio_seeding"
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_seeding"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Seeding Phase" />
 
-                        <RadioButton
-                            android:id="@+id/radio_growing"
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_growing"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Growing Active" />
 
-                        <RadioButton
-                            android:id="@+id/radio_harvest"
+                        <com.google.android.material.chip.Chip
+                            android:id="@+id/chip_harvest"
+                            style="@style/Widget.MaterialComponents.Chip.Choice"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Ready to Harvest" />
-                    </RadioGroup>
+                    </com.google.android.material.chip.ChipGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 

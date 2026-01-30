@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/navigation_home"
+        android:icon="@drawable/ic_home_bottom"
+        android:title="Home" />
+    <item
         android:id="@+id/navigation_plants"
         android:icon="@drawable/ic_plants"
         android:title="Plants" />
@@ -8,10 +12,6 @@
         android:id="@+id/navigation_diary"
         android:icon="@drawable/ic_diary"
         android:title="Diary" />
-    <item
-        android:id="@+id/navigation_home"
-        android:icon="@drawable/ic_home_bottom"
-        android:title="Home" />
     <item
         android:id="@+id/navigation_account"
         android:icon="@drawable/ic_account"

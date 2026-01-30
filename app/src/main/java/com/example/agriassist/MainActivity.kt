@@ -2,84 +2,79 @@ package com.example.agriassist
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Button
 import android.widget.Toast
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.example.agriassist.databinding.ActivityMainBinding
+
 class MainActivity : AppCompatActivity() {
 
+    // 1. Declare the binding variable
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        Toast.makeText(this, "MainActivity: onCreate called", Toast.LENGTH_SHORT).show()
+        // 2. Initialize ViewBinding
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        val learnMoreButton = findViewById<Button?>(R.id.learn_more)
-        val bottomNav = findViewById<BottomNavigationView?>(R.id.bottom_navigation)
-
-
-        bottomNav.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_diary -> {
-                    val intent = Intent(this, DiaryActivity::class.java)
-                    startActivity(intent)
-                    true
-                }
-                R.id.navigation_home ->{
-                    true
-                }
-               else -> false
-
-
-            }
-
+        // Apply window insets to handle status bar overlap
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, 0) // Keep bottom padding 0 for nav bar
+            insets
         }
 
-        learnMoreButton?.setOnClickListener {
-            val intent = Intent(this, Learn_More::class.java)
-            startActivity(intent)
-        }
-
-        findViewById<android.view.View?>(R.id.main)?.let { mainView ->
-            ViewCompat.setOnApplyWindowInsetsListener(mainView) { v, insets ->
-                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-                insets
-            }
-        }
-    }
-
-    override fun onStart() {
-        super.onStart()
-        Toast.makeText(this, "MainActivity: onStart called", Toast.LENGTH_SHORT).show()
+        // --- Setup Listeners --- //
+        setupClickListeners()
+        setupBottomNavigation()
     }
 
     override fun onResume() {
         super.onResume()
-        Toast.makeText(this, "MainActivity: onResume called", Toast.LENGTH_SHORT).show()
+        // 3. Ensure "Home" is selected when returning to this activity
+        binding.bottomNavigation.selectedItemId = R.id.navigation_home
     }
 
-    override fun onPause() {
-        super.onPause()
-        Toast.makeText(this, "MainActivity: onPause called", Toast.LENGTH_SHORT).show()
+    private fun setupClickListeners() {
+        // 4. Make the weather card interactive
+        binding.weatherCard.setOnClickListener {
+            Toast.makeText(this, "Fetching latest weather data...", Toast.LENGTH_SHORT).show()
+            // In the future, you could open a detailed weather screen here
+        }
+
+        binding.learnMore.setOnClickListener {
+            startActivity(Intent(this, Learn_More::class.java))
+        }
     }
 
-    override fun onStop() {
-        super.onStop()
-        Toast.makeText(this, "MainActivity: onStop called", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Toast.makeText(this, "MainActivity: onDestroy called", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onRestart() {
-        super.onRestart()
-        Toast.makeText(this, "MainActivity: onRestart called", Toast.LENGTH_SHORT).show()
+    private fun setupBottomNavigation() {
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            // 5. Add a smooth, non-animated transition between activities
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    // Already on the home screen, do nothing
+                    true
+                }
+                R.id.navigation_plants -> {
+                    startActivity(Intent(this, PlantsActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.navigation_diary -> {
+                    startActivity(Intent(this, DiaryActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                R.id.navigation_account -> {
+                    startActivity(Intent(this, AccountActivity::class.java))
+                    overridePendingTransition(0, 0)
+                    true
+                }
+                else -> false
+            }
+        }
     }
 }

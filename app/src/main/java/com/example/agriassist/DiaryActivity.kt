@@ -3,11 +3,11 @@ package com.example.agriassist
 import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
-import android.widget.RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import com.example.agriassist.databinding.ActivityAddEntryBinding
+import com.google.android.material.chip.Chip
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -80,10 +80,10 @@ class DiaryActivity : AppCompatActivity() {
             return
         }
 
-        // Get Status
-        val selectedId = binding.cropStatusRadioGroup.checkedRadioButtonId
+        // Get Status from ChipGroup
+        val selectedId = binding.cropStatusChipGroup.checkedChipId
         val status = if (selectedId != -1) {
-            findViewById<RadioButton>(selectedId).text.toString()
+            findViewById<Chip>(selectedId).text.toString()
         } else {
             "Not Specified"
         }
@@ -136,6 +136,6 @@ class DiaryActivity : AppCompatActivity() {
         binding.entryTitleEditText.text?.clear()
         binding.entryNotesEditText.text?.clear()
         binding.wateredCheckbox.isChecked = false
-        binding.cropStatusRadioGroup.clearCheck()
+        binding.cropStatusChipGroup.clearCheck()
     }
 }
