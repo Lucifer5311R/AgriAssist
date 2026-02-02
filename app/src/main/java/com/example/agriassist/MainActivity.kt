@@ -60,17 +60,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.navigation_plants -> {
                     startActivity(Intent(this, PlantsActivity::class.java))
-                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_diary -> {
                     startActivity(Intent(this, DiaryActivity::class.java))
-                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_account -> {
                     startActivity(Intent(this, AccountActivity::class.java))
-                    overridePendingTransition(0, 0)
                     true
                 }
                 R.id.navigation_camera -> {
