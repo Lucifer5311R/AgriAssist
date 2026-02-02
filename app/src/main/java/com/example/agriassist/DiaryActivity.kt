@@ -3,6 +3,7 @@ package com.example.agriassist
 import android.app.DatePickerDialog
 import android.content.Context
 import android.os.Bundle
+import android.widget.RadioButton // Imported RadioButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -15,26 +16,22 @@ import java.util.Locale
 
 class DiaryActivity : AppCompatActivity() {
 
-    // 1. Enable ViewBinding
     private lateinit var binding: ActivityAddEntryBinding
     private val calendar = Calendar.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        // Initialize ViewBinding (Matches activity_add_entry.xml)
         binding = ActivityAddEntryBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         setupToolbar()
         setupDatePicker()
 
-        // 2. Save Button Logic
         binding.saveEntryButton.setOnClickListener {
             saveDiaryEntry()
         }
 
-        // 3. History Button Logic
         binding.btnViewHistory.setOnClickListener {
             showHistoryDialog()
         }
@@ -44,9 +41,9 @@ class DiaryActivity : AppCompatActivity() {
         setSupportActionBar(binding.toolbarAddEntry)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbarAddEntry.setNavigationOnClickListener {
-            finish() // Go back when arrow is clicked
+            finish()
         }
-        updateDateDisplay() // Show current date by default
+        updateDateDisplay()
     }
 
     private fun setupDatePicker() {
@@ -80,26 +77,34 @@ class DiaryActivity : AppCompatActivity() {
             return
         }
 
-        // Get Status from ChipGroup
-        val selectedId = binding.cropStatusChipGroup.checkedChipId
-        val status = if (selectedId != -1) {
-            findViewById<Chip>(selectedId).text.toString()
+        // 1. Get Status from ChipGroup
+        val selectedChipId = binding.cropStatusChipGroup.checkedChipId
+        val status = if (selectedChipId != -1) {
+            findViewById<Chip>(selectedChipId).text.toString()
         } else {
             "Not Specified"
         }
 
-        // --- THE USEFUL PART: Save to Internal Storage ---
+        // 2. Get Weather from RadioGroup (NEW)
+        val selectedWeatherId = binding.weatherRadioGroup.checkedRadioButtonId
+        val weather = if (selectedWeatherId != -1) {
+            findViewById<RadioButton>(selectedWeatherId).text.toString()
+        } else {
+            "Not Recorded"
+        }
+
+        // 3. Save to String
         val entryData = """
             --------------------------------
             Date: $date
             Title: $title
             Status: $status
+            Weather: $weather
             Watered: ${if (isWatered) "Yes" else "No"}
             Notes: $notes
         """.trimIndent() + "\n"
 
         try {
-            // "diary_log.txt" is the file name, MODE_APPEND adds to the end instead of overwriting
             openFileOutput("diary_log.txt", Context.MODE_APPEND).use {
                 it.write(entryData.toByteArray())
             }
@@ -112,7 +117,6 @@ class DiaryActivity : AppCompatActivity() {
     }
 
     private fun showHistoryDialog() {
-        // Read the file
         val file = File(filesDir, "diary_log.txt")
         val history = if (file.exists()) {
             file.readText()
@@ -120,7 +124,6 @@ class DiaryActivity : AppCompatActivity() {
             "No diary entries found yet."
         }
 
-        // Show in a popup
         AlertDialog.Builder(this)
             .setTitle("My Diary History")
             .setMessage(history)
@@ -137,5 +140,6 @@ class DiaryActivity : AppCompatActivity() {
         binding.entryNotesEditText.text?.clear()
         binding.wateredCheckbox.isChecked = false
         binding.cropStatusChipGroup.clearCheck()
+        binding.weatherRadioGroup.clearCheck() // Clear radio selection
     }
 }

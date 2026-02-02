@@ -157,6 +157,43 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="Weather Condition"
+                android:textColor="#2E7D32"
+                android:textStyle="bold" />
+
+            <RadioGroup
+                android:id="@+id/weather_radio_group"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="16dp">
+
+                <RadioButton
+                    android:id="@+id/radio_sunny"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Sunny" />
+
+                <RadioButton
+                    android:id="@+id/radio_cloudy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Cloudy" />
+
+                <RadioButton
+                    android:id="@+id/radio_rainy"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Rainy" />
+            </RadioGroup>
             <com.google.android.material.checkbox.MaterialCheckBox
                 android:id="@+id/watered_checkbox"
                 android:layout_width="match_parent"

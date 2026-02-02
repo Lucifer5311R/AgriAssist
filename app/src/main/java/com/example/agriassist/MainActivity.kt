@@ -7,11 +7,20 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.agriassist.databinding.ActivityMainBinding
+import android.graphics.Bitmap
+import android.provider.MediaStore
+import androidx.activity.result.contract.ActivityResultContracts
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.label.ImageLabeling
+import com.google.mlkit.vision.label.defaults.ImageLabelerOptions  // these are the imports required for machine learning kit which labels the images
+
+
 
 class MainActivity : AppCompatActivity() {
 
     // 1. Declare the binding variable
     private lateinit var binding: ActivityMainBinding
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +47,17 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigation.selectedItemId = R.id.navigation_home
     }
 
+    // Change THIS line to include "result" before the arrow
+    private val takePictureLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val imageBitmap = result.data?.extras?.get("data") as? Bitmap
+            if (imageBitmap != null) {
+                identifyPlant(imageBitmap)
+            }
+        }
+    }
+
+
     private fun setupClickListeners() {
         // 4. Make the weather card interactive
         binding.weatherCard.setOnClickListener {
@@ -49,6 +69,46 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, Learn_More::class.java))
         }
     }
+
+    private fun dispatchTakePictureIntent(){
+        val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        try {
+            takePictureLauncher.launch(takePictureIntent)
+        }
+        catch(e : Exception)
+        {
+            Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun identifyPlant(bitmap: Bitmap) {
+        // 1. Prepare the image for ML Kit
+        val image = InputImage.fromBitmap(bitmap, 0)
+
+        // 2. Get the labeler (default generic model)
+        // Note: For specific plants, you would eventually use 'ImageLabelerOptions.Builder()' with a custom plant model.
+        val labeler = ImageLabeling.getClient(ImageLabelerOptions.DEFAULT_OPTIONS)
+
+        // 3. Process the image
+        labeler.process(image)
+            .addOnSuccessListener { labels ->
+                // Task completed successfully
+                val stringBuilder = StringBuilder()
+                for (label in labels) {
+                    val text = label.text
+                    val confidence = label.confidence
+                    stringBuilder.append("$text : $confidence\n")
+                }
+
+                // 4. Show result to user (For now, a Toast or Dialog)
+                Toast.makeText(this, "Identified: \n$stringBuilder", Toast.LENGTH_LONG).show()
+            }
+            .addOnFailureListener { e ->
+                // Task failed with an exception
+                Toast.makeText(this, "Failed to identify: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
 
     private fun setupBottomNavigation() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
@@ -71,6 +131,7 @@ class MainActivity : AppCompatActivity() {
                     true
                 }
                 R.id.navigation_camera -> {
+                    dispatchTakePictureIntent()
                     true
                 }
                 else -> false
