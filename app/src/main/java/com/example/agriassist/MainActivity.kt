@@ -73,6 +73,9 @@ class MainActivity : AppCompatActivity() {
                     overridePendingTransition(0, 0)
                     true
                 }
+                R.id.navigation_camera -> {
+                    true
+                }
                 else -> false
             }
         }
