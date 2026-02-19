@@ -1,11 +1,12 @@
 package com.example.agriassist
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
 import com.example.agriassist.databinding.ActivityPlantsBinding
+import com.example.agriassist.PlantDetailFragment
 
-class PlantsActivity : AppCompatActivity() {
+class PlantsActivity : AppCompatActivity(), PlantGridFragment.OnPlantClickListener {
 
     private lateinit var binding: ActivityPlantsBinding
 
@@ -14,31 +15,25 @@ class PlantsActivity : AppCompatActivity() {
         binding = ActivityPlantsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupToolbar()
-        setupRecyclerView()
-    }
-
-    private fun setupToolbar() {
         setSupportActionBar(binding.toolbarPlants)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        binding.toolbarPlants.setNavigationOnClickListener {
-            finish() // Go back when the arrow is clicked
+        binding.toolbarPlants.setNavigationOnClickListener { onBackPressedDispatcher.onBackPressed() }
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, PlantGridFragment())
+                .commit()
+        }
+
+        binding.fabCamera.setOnClickListener {
+            startActivity(Intent(this, CameraActivity::class.java))
         }
     }
 
-    private fun setupRecyclerView() {
-        // Create some sample plant data
-        val plantList = listOf(
-            Plant("Tomato", "Growing Active", R.drawable.img),
-            Plant("Cucumber", "Ready to Harvest", R.drawable.img),
-            Plant("Bell Pepper", "Seeding Phase", R.drawable.img),
-            Plant("Lettuce", "Growing Active", R.drawable.img),
-            Plant("Carrot", "Ready to Harvest", R.drawable.img),
-            Plant("Broccoli", "Seeding Phase", R.drawable.img)
-        )
-
-        // Set up the RecyclerView with the adapter
-        binding.plantsRecyclerView.layoutManager = GridLayoutManager(this, 2)
-        binding.plantsRecyclerView.adapter = PlantAdapter(plantList)
+    override fun onPlantClick(plant: Plant) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, PlantDetailFragment.newInstance(plant))
+            .addToBackStack(null)
+            .commit()
     }
 }
