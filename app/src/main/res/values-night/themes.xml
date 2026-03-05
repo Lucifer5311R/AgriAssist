@@ -1,7 +1,19 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.AgriAssist" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+    <style name="Base.Theme.AgriAssist" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">#81C784</item>
+        <item name="colorPrimaryVariant">#2E7D32</item>
+        <item name="colorOnPrimary">@android:color/black</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">#AED581</item>
+        <item name="colorSecondaryVariant">#689F38</item>
+        <item name="colorOnSecondary">@android:color/black</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
+        <!-- Surface colors for night theme -->
+        <item name="colorSurface">#1E1E1E</item>
+        <item name="colorOnSurface">#EEEEEE</item>
+        <item name="android:windowBackground">@color/backgroundColorNight</item>
     </style>
 </resources>

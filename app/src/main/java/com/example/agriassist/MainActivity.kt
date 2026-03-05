@@ -1,11 +1,17 @@
 package com.example.agriassist
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupWithNavController
 import com.example.agriassist.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -13,9 +19,18 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Apply saved theme before setContentView
+        val prefs = getSharedPreferences("AgriAssistPrefs", Context.MODE_PRIVATE)
+        val isDark = prefs.getBoolean("darkMode", false)
+        AppCompatDelegate.setDefaultNightMode(
+            if (isDark) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+        )
+
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        setSupportActionBar(binding.toolbar)
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -23,51 +38,37 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        setupClickListeners()
-        setupBottomNavigation()
+        setupNavigation()
     }
 
-    override fun onResume() {
-        super.onResume()
-        binding.bottomNavigation.selectedItemId = R.id.navigation_home
+    private fun setupNavigation() {
+        val navHostFragment = supportFragmentManager
+            .findFragmentById(R.id.nav_host_fragment) as NavHostFragment
+        val navController = navHostFragment.navController
+        binding.bottomNavigation.setupWithNavController(navController)
     }
 
-    private fun setupClickListeners() {
-        binding.weatherCard.setOnClickListener {
-            Toast.makeText(this, "Fetching latest weather data...", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.learnMore.setOnClickListener {
-            startActivity(Intent(this, Learn_More::class.java))
-        }
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.main_options_menu, menu)
+        return true
     }
 
-    private fun setupBottomNavigation() {
-        binding.bottomNavigation.setOnItemSelectedListener { item ->
-            when (item.itemId) {
-                R.id.navigation_home -> true // Already here
-                R.id.navigation_plants -> {
-                    startActivity(Intent(this, PlantsActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
-                }
-                R.id.navigation_diary -> {
-                    startActivity(Intent(this, DiaryActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
-                }
-                R.id.navigation_account -> {
-                    startActivity(Intent(this, AccountActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
-                }
-                R.id.navigation_camera -> {
-                    startActivity(Intent(this, CameraActivity::class.java))
-                    overridePendingTransition(0, 0)
-                    true
-                }
-                else -> false
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                startActivity(Intent(this, SettingsActivity::class.java))
+                true
             }
+            R.id.action_share -> {
+                val shareIntent = Intent().apply {
+                    action = Intent.ACTION_SEND
+                    putExtra(Intent.EXTRA_TEXT, "Check out AgriAssist – Your smart farming companion!")
+                    type = "text/plain"
+                }
+                startActivity(Intent.createChooser(shareIntent, "Share AgriAssist"))
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

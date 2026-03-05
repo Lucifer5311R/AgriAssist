@@ -1,112 +1,161 @@
 package com.example.agriassist
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import coil.load
 import com.example.agriassist.databinding.FragmentPlantDetailBinding
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import java.io.File
+import java.net.URLEncoder
 
 class PlantDetailFragment : Fragment() {
 
     private var _binding: FragmentPlantDetailBinding? = null
     private val binding get() = _binding!!
-    private val TAG = "PlantDetailLifecycle"
 
     companion object {
         private const val ARG_PLANT = "plant"
-
         fun newInstance(plant: Plant): PlantDetailFragment {
-            val fragment = PlantDetailFragment()
-            val args = Bundle().apply {
-                putParcelable(ARG_PLANT, plant)
+            return PlantDetailFragment().apply {
+                arguments = Bundle().apply { putParcelable(ARG_PLANT, plant) }
             }
-            fragment.arguments = args
-            return fragment
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentPlantDetailBinding.inflate(inflater, container, false)
-        Log.d(TAG, "onCreateView() called")
-        Toast.makeText(activity, "Detail: onCreateView", Toast.LENGTH_SHORT).show()
         return binding.root
     }
 
+    @Suppress("DEPRECATION")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        Log.d(TAG, "onViewCreated() called")
-        Toast.makeText(activity, "Detail: onViewCreated", Toast.LENGTH_SHORT).show()
 
-        arguments?.getParcelable<Plant>(ARG_PLANT)?.let {
-            binding.plantNameDetail.text = it.name
-            binding.plantStatusDetail.text = it.status
-            binding.plantDescription.text = it.description
-            binding.plantImageDetail.load(it.imageUrl) {
-                crossfade(true)
-                placeholder(R.drawable.img)
+        val plant = arguments?.getParcelable<Plant>(ARG_PLANT) ?: return
+
+        // ── Basic info ───────────────────────────────────────────
+        binding.plantNameDetail.text   = plant.name
+        binding.plantStatusDetail.text = plant.status
+        binding.plantDescription.text  = plant.description
+
+        // ── Hero image — local file first, then URL ───────────────
+        if (plant.localImagePath.isNotEmpty()) {
+            val file = File(plant.localImagePath)
+            if (file.exists()) {
+                binding.plantImageDetail.load(file) {
+                    crossfade(true); placeholder(R.drawable.img)
+                }
+            } else loadImageFromUrl(plant.imageUrl)
+        } else {
+            loadImageFromUrl(plant.imageUrl)
+        }
+
+        // ── AI-scanned extras ────────────────────────────────────
+        if (plant.isUserAdded) {
+            binding.badgeAiScanned.visibility = View.VISIBLE
+
+            if (plant.scientificName.isNotEmpty()) {
+                binding.plantScientificName.text       = plant.scientificName
+                binding.plantScientificName.visibility = View.VISIBLE
+            }
+            if (plant.family.isNotEmpty() && plant.family != "—") {
+                binding.chipFamily.text       = "Family: ${plant.family}"
+                binding.chipFamily.visibility = View.VISIBLE
+            }
+            if (plant.genus.isNotEmpty() && plant.genus != "—") {
+                binding.chipGenus.text       = "Genus: ${plant.genus}"
+                binding.chipGenus.visibility = View.VISIBLE
+            }
+            if (plant.careInfo.isNotEmpty() && plant.careInfo != "—") {
+                binding.plantCareInfo.text      = plant.careInfo
+                binding.cardCareInfo.visibility = View.VISIBLE
+            }
+
+            // Show remove button only for user-added plants
+            binding.btnRemovePlant.visibility = View.VISIBLE
+        }
+
+        // ── Remove from My Plants ────────────────────────────────
+        binding.btnRemovePlant.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Remove Plant")
+                .setMessage("Remove \"${plant.name}\" from My Plants?")
+                .setPositiveButton("Remove") { _, _ ->
+                    PlantRepository.removePlant(requireContext(), plant.name)
+                    Toast.makeText(requireContext(), "${plant.name} removed", Toast.LENGTH_SHORT).show()
+                    findNavController().popBackStack()
+                }
+                .setNegativeButton("Cancel", null)
+                .show()
+        }
+
+        // ── WhatsApp share ───────────────────────────────────────
+        binding.btnWhatsappShare.setOnClickListener { sendWhatsAppReport(plant) }
+    }
+
+    private fun loadImageFromUrl(url: String) {
+        if (url.isNotEmpty()) {
+            binding.plantImageDetail.load(url) {
+                crossfade(true); placeholder(R.drawable.img)
             }
         }
     }
 
-    //<editor-fold desc="Lifecycle Logging">
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        Log.d(TAG, "onAttach() called")
-        Toast.makeText(context, "Detail: onAttach", Toast.LENGTH_SHORT).show()
-    }
+    private fun sendWhatsAppReport(plant: Plant) {
+        val prefs       = requireContext().getSharedPreferences("AgriAssistPrefs", Context.MODE_PRIVATE)
+        val farmName    = prefs.getString("farmName", "My Farm")
+        val phone       = prefs.getString("emergencyPhone", "")
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate() called")
-        Toast.makeText(activity, "Detail: onCreate", Toast.LENGTH_SHORT).show()
-    }
+        val careSection = if (plant.careInfo.isNotEmpty() && plant.careInfo != "—")
+            "\n*Care Guide:*\n${plant.careInfo}\n" else ""
 
-    override fun onStart() {
-        super.onStart()
-        Log.d(TAG, "onStart() called")
-        Toast.makeText(activity, "Detail: onStart", Toast.LENGTH_SHORT).show()
-    }
+        val msg = """
+🌱 *AgriAssist Farm Report* 🌱
+──────────────────────
+*Farm:* $farmName
+*Plant:* ${plant.name}
+*Status:* ${plant.status}
+${if (plant.scientificName.isNotEmpty()) "*Scientific Name:* ${plant.scientificName}\n" else ""}${if (plant.family.isNotEmpty() && plant.family != "—") "*Family:* ${plant.family}\n" else ""}
+*About:*
+${plant.description}
+$careSection
+_Sent via AgriAssist Smart Farming App_ 🌿
+        """.trimIndent()
 
-    override fun onResume() {
-        super.onResume()
-        Log.d(TAG, "onResume() called")
-        Toast.makeText(activity, "Detail: onResume", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        Log.d(TAG, "onPause() called")
-        Toast.makeText(activity, "Detail: onPause", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        Log.d(TAG, "onStop() called")
-        Toast.makeText(activity, "Detail: onStop", Toast.LENGTH_SHORT).show()
+        try {
+            val url = "https://api.whatsapp.com/send?phone=$phone&text=" +
+                      URLEncoder.encode(msg, "UTF-8")
+            val i = Intent(Intent.ACTION_VIEW).apply {
+                setPackage("com.whatsapp")
+                data = Uri.parse(url)
+            }
+            if (i.resolveActivity(requireContext().packageManager) != null) {
+                startActivity(i)
+            } else {
+                startActivity(Intent.createChooser(
+                    Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, msg)
+                    }, "Share Report"
+                ))
+            }
+        } catch (e: Exception) {
+            Toast.makeText(requireContext(), "Could not open WhatsApp", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-        Log.d(TAG, "onDestroyView() called")
-        Toast.makeText(activity, "Detail: onDestroyView", Toast.LENGTH_SHORT).show()
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        Log.d(TAG, "onDestroy() called")
-        Toast.makeText(activity, "Detail: onDestroy", Toast.LENGTH_SHORT).show()
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        Log.d(TAG, "onDetach() called")
-        Toast.makeText(activity, "Detail: onDetach", Toast.LENGTH_SHORT).show()
-    }
-    //</editor-fold>
 }

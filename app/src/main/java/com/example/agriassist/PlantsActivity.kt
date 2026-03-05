@@ -2,6 +2,8 @@ package com.example.agriassist
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.agriassist.databinding.ActivityPlantsBinding
 import com.example.agriassist.PlantDetailFragment
@@ -35,5 +37,19 @@ class PlantsActivity : AppCompatActivity(), PlantGridFragment.OnPlantClickListen
             .replace(R.id.fragment_container, PlantDetailFragment.newInstance(plant))
             .addToBackStack(null)
             .commit()
+    }
+
+    override fun onContextItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.context_analyze -> {
+                Toast.makeText(this, "Analyze with Camera clicked", Toast.LENGTH_SHORT).show()
+                true
+            }
+            R.id.context_history -> {
+                Toast.makeText(this, "View Growth History clicked", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> super.onContextItemSelected(item)
+        }
     }
 }

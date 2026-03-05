@@ -1,50 +1,214 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F1F8E9"
-    tools:context=".PlantDetailFragment">
+    android:background="?android:attr/windowBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:paddingBottom="32dp">
 
-        <ImageView
-            android:id="@+id/plant_image_detail"
+        <!-- Hero image -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
-            android:layout_height="240dp"
-            android:scaleType="centerCrop"
-            android:src="@drawable/img" />
-
-        <TextView
-            android:id="@+id/plant_name_detail"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Plant Name"
-            android:textColor="#333333"
-            android:textSize="24sp"
-            android:textStyle="bold" />
+            app:cardCornerRadius="0dp"
+            app:cardElevation="4dp">
+            <ImageView
+                android:id="@+id/plant_image_detail"
+                android:layout_width="match_parent"
+                android:layout_height="260dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/img" />
+        </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/plant_status_detail"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Plant Status"
-            android:textSize="18sp" />
+            android:orientation="vertical"
+            android:padding="20dp">
 
-        <TextView
-            android:id="@+id/plant_description"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:text="Plant Description"
-            android:textSize="16sp" />
+            <!-- Name row -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
 
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/plant_name_detail"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Plant Name"
+                        android:textColor="?attr/colorOnSurface"
+                        android:textSize="28sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/plant_scientific_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="?attr/colorSecondary"
+                        android:textSize="14sp"
+                        android:fontFamily="serif"
+                        android:textStyle="italic"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <!-- AI badge for user-added plants -->
+                <TextView
+                    android:id="@+id/badge_ai_scanned"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="#E8F5E9"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="4dp"
+                    android:text="🤖 AI Scanned"
+                    android:textColor="#2E7D32"
+                    android:textSize="11sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Status chip + family + genus -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/plant_status_detail"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text="Status"
+                    app:chipBackgroundColor="#E8F5E9"
+                    app:chipStrokeWidth="0dp"
+                    android:textColor="#2E7D32" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_family"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="8dp"
+                    android:text=""
+                    app:chipBackgroundColor="#F3E5F5"
+                    app:chipStrokeWidth="0dp"
+                    android:textColor="#7B1FA2"
+                    android:visibility="gone" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chip_genus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=""
+                    app:chipBackgroundColor="#E3F2FD"
+                    app:chipStrokeWidth="0dp"
+                    android:textColor="#1565C0"
+                    android:visibility="gone" />
+            </LinearLayout>
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/colorControlHighlight"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="16dp" />
+
+            <!-- About section -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="📖 About this Plant"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <TextView
+                android:id="@+id/plant_description"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Plant Description"
+                android:lineSpacingMultiplier="1.5"
+                android:textColor="?attr/colorOnSurface"
+                android:alpha="0.8"
+                android:textSize="14sp" />
+
+            <!-- Care guide card (shown for AI-scanned plants) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/card_care_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:visibility="gone"
+                app:cardBackgroundColor="#E8F5E9"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="🪴 Care Guide"
+                        android:textColor="#1B5E20"
+                        android:textSize="16sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="10dp" />
+
+                    <TextView
+                        android:id="@+id/plant_care_info"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text=""
+                        android:textColor="#2E7D32"
+                        android:textSize="13sp"
+                        android:lineSpacingMultiplier="1.8" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Remove from My Plants button (only for user-added) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_remove_plant"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:layout_marginTop="16dp"
+                android:text="🗑️  Remove from My Plants"
+                android:textColor="#D32F2F"
+                app:strokeColor="#D32F2F"
+                app:cornerRadius="14dp"
+                android:visibility="gone" />
+
+            <!-- WhatsApp share button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btn_whatsapp_share"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="12dp"
+                android:text="📤  Send Report via WhatsApp"
+                app:cornerRadius="14dp"
+                app:backgroundTint="#25D366"
+                android:textColor="@android:color/white" />
+
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

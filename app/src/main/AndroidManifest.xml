@@ -4,6 +4,7 @@
 
     <uses-feature android:name="android.hardware.camera.any" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -13,10 +14,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:usesCleartextTraffic="true"
         android:theme="@style/Theme.AgriAssist">
 
         <activity
             android:name=".LoginActivity"
+            android:theme="@style/Theme.App.Starting"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,6 +41,8 @@
         <activity android:name=".AccountActivity"
             android:exported="false" />
         <activity android:name=".CameraActivity"
+            android:exported="false" />
+        <activity android:name=".SettingsActivity"
             android:exported="false" />
     </application>
 

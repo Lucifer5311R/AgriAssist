@@ -1,25 +1,306 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CameraActivity">
+    android:background="?attr/colorSurface">
 
+    <!-- Camera Preview -->
     <androidx.camera.view.PreviewView
         android:id="@+id/viewFinder"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
 
-    <Button
-        android:id="@+id/image_capture_button"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
-        android:layout_marginBottom="50dp"
-        android:elevation="2dp"
-        android:text="Take Photo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <!-- Scan animation overlay -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/scanning_animation"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/camera_scan" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- Loading overlay -->
+    <LinearLayout
+        android:id="@+id/loading_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#CC000000"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:layout_width="64dp"
+            android:layout_height="64dp"
+            android:indeterminateTint="#81C784" />
+
+        <TextView
+            android:id="@+id/loading_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="🔍 Analysing plant with AI…"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!-- Bottom action buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingBottom="32dp"
+        android:paddingTop="16dp">
+
+        <!-- Gallery button -->
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/btn_gallery"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="24dp"
+            android:src="@android:drawable/ic_menu_gallery"
+            app:backgroundTint="#1B5E20"
+            app:tint="#FFFFFF"
+            app:fabSize="normal" />
+
+        <!-- Capture button -->
+        <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+            android:id="@+id/image_capture_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Identify Plant"
+            android:textColor="@android:color/white"
+            app:icon="@android:drawable/ic_menu_camera"
+            app:iconTint="@android:color/white"
+            app:backgroundTint="#2E7D32" />
+    </LinearLayout>
+
+    <!-- Result card (bottom sheet style) -->
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/result_card"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:background="?attr/colorSurface"
+        android:visibility="gone"
+        app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="32dp">
+
+            <!-- Drag handle -->
+            <View
+                android:layout_width="40dp"
+                android:layout_height="4dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="8dp"
+                android:background="#CCCCCC" />
+
+            <!-- Captured Image -->
+            <ImageView
+                android:id="@+id/captured_image"
+                android:layout_width="match_parent"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:background="#111111" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- Badge row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="8dp">
+
+                    <TextView
+                        android:id="@+id/result_health_badge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="4dp"
+                        android:text="✅ Identified"
+                        android:textColor="#FFFFFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:background="#2E7D32" />
+
+                    <View android:layout_width="0dp" android:layout_height="1dp" android:layout_weight="1"/>
+
+                    <TextView
+                        android:id="@+id/result_confidence"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI Confidence: 95%"
+                        android:textColor="?attr/colorPrimary"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Confidence bar -->
+                <ProgressBar
+                    android:id="@+id/confidence_bar"
+                    style="@android:style/Widget.ProgressBar.Horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:max="100"
+                    android:progress="0"
+                    android:progressTint="#2E7D32"
+                    android:progressBackgroundTint="#E0E0E0" />
+
+                <!-- Plant name -->
+                <TextView
+                    android:id="@+id/result_plant_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rose"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="26sp"
+                    android:textStyle="bold" />
+
+                <!-- Scientific name -->
+                <TextView
+                    android:id="@+id/result_scientific_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Rosa canina"
+                    android:textColor="?attr/colorSecondary"
+                    android:textSize="14sp"
+                    android:fontFamily="serif"
+                    android:textStyle="italic" />
+
+                <!-- Family | Genus -->
+                <TextView
+                    android:id="@+id/result_family"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Family: Rosaceae  |  Genus: Rosa"
+                    android:textColor="#757575"
+                    android:textSize="12sp" />
+
+                <!-- Divider -->
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:background="?attr/colorControlHighlight"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="12dp" />
+
+                <!-- Description label -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="📋 Description"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="6dp"/>
+
+                <TextView
+                    android:id="@+id/result_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Description text"
+                    android:textColor="?attr/colorOnSurface"
+                    android:textSize="13sp"
+                    android:lineSpacingMultiplier="1.5"
+                    android:alpha="0.8" />
+
+                <!-- Care info -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardBackgroundColor="#E8F5E9"
+                    app:cardCornerRadius="12dp"
+                    app:cardElevation="0dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="14dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="🪴 Care Guide"
+                            android:textColor="#1B5E20"
+                            android:textSize="13sp"
+                            android:textStyle="bold"
+                            android:layout_marginBottom="6dp"/>
+                        <TextView
+                            android:id="@+id/result_care_info"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Care info"
+                            android:textColor="#2E7D32"
+                            android:textSize="13sp"
+                            android:lineSpacingMultiplier="1.6" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Add to My Plants button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_add_to_plants"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginTop="20dp"
+                    android:text="🌿  Add to My Plants"
+                    android:textSize="15sp"
+                    android:textColor="@android:color/white"
+                    app:backgroundTint="#2E7D32"
+                    app:cornerRadius="14dp"
+                    app:icon="@drawable/ic_plants"
+                    app:iconTint="@android:color/white"
+                    app:iconSize="18dp"
+                    app:iconPadding="8dp" />
+
+                <!-- Already added label (hidden by default) -->
+                <TextView
+                    android:id="@+id/tv_already_added"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:gravity="center"
+                    android:text="✅ Already in My Plants"
+                    android:textColor="#2E7D32"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    android:visibility="gone" />
+
+                <!-- Close / Retry button -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_close_result"
+                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:layout_marginTop="10dp"
+                    android:text="Scan Another Plant"
+                    android:textColor="#2E7D32"
+                    app:strokeColor="#2E7D32"
+                    app:cornerRadius="14dp" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

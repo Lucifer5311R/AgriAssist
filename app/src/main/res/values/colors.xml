@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="primaryColor">#2E7D32</color>
+    <color name="primaryLightColor">#60ad5e</color>
+    <color name="primaryDarkColor">#005005</color>
+    <color name="secondaryColor">#8BC34A</color>
+    <color name="secondaryLightColor">#bef67a</color>
+    <color name="secondaryDarkColor">#5a9216</color>
+    <color name="primaryTextColor">#ffffff</color>
+    <color name="secondaryTextColor">#000000</color>
+    <color name="backgroundColor">#F1F8E9</color>
+    <color name="surfaceColor">#FFFFFF</color>
+    <color name="errorColor">#B00020</color>
+    
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="whatsapp_green">#25D366</color>
+    <color name="backgroundColorNight">#121212</color>
+    <color name="cardColorNight">#1E1E1E</color>
+    <color name="textPrimaryNight">#EEEEEE</color>
+    <color name="textSecondaryNight">#AAAAAA</color>
 </resources>

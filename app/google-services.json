@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "58949714942",
+    "project_id": "agri-assist-4b7e5",
+    "storage_bucket": "agri-assist-4b7e5.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:58949714942:android:9d3f7ff12e4d042f0c36af",
+        "android_client_info": {
+          "package_name": "com.example.agriassist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "58949714942-cod75op84mfprpm6k3hbhhgqdn729s0a.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.agriassist",
+            "certificate_hash": "963f47cd70f7f9e489e1d3fe3b66fec2df5f4f9d"
+          }
+        },
+        {
+          "client_id": "58949714942-5rm88kjo2osjohb8ver1ba6rcvobc04c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6AVYufulDPZ17m3Ucask703k1MRjdRi4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "58949714942-5rm88kjo2osjohb8ver1ba6rcvobc04c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

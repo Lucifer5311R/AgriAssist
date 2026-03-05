@@ -13,11 +13,11 @@
         android:icon="@drawable/ic_diary"
         android:title="Diary" />
     <item
+        android:id="@+id/navigation_marketplace"
+        android:icon="@drawable/ic_marketplace"
+        android:title="Market" />
+    <item
         android:id="@+id/navigation_account"
         android:icon="@drawable/ic_account"
         android:title="Account" />
-    <item
-        android:id = "@+id/navigation_camera"
-        android:icon = "@drawable/ic_camera_icon"
-        android:title = "Camera" />
 </menu>
